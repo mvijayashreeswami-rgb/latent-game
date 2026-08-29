@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India's Got Latent - Web Edition</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-neutral-950 text-white font-sans select-none min-h-screen flex flex-col justify-between p-4">
+
+    <!-- 1. BANNER -->
+    <header class="w-full text-center py-4 border-b border-neutral-800">
+        <h1 class="text-3xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-500 to-orange-500 uppercase drop-shadow-[0_5px_15px_rgba(220,38,38,0.4)]">
+            India's Got Latent
+        </h1>
+        <p class="text-xs text-neutral-400 mt-1 tracking-wider">Web Edition • Where Careers Go to Die</p>
+    </header>
+
+    <!-- APP CONTAINER -->
+    <main id="app" class="flex-1 flex flex-col items-center justify-center w-full max-w-5xl mx-auto">
+        <!-- Dynamic content injected by JS -->
+    </main>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        const contestants = [
+            {
+                name: "Ramesh Kumar",
+                age: 24,
+                bio: "Software engineer by day, professional underwater poet by night.",
+                talent: "Reciting a sad shayari about memory leaks while beatboxing.",
+                roastReaction: "Bhai, tera code crash ho ya na ho, tera career zaroor crash ho gaya."
+            },
+            {
+                name: "Pooja Sharma",
+                age: 29,
+                bio: "Unemployed life coach and certified crystal healer.",
+                talent: "Balancing an iron tawa on her chin while talking about manifestation.",
+                roastReaction: "Manifesting a job would be a better use of your time."
+            },
+            {
+                name: "Bunty Singh",
+                age: 21,
+                bio: "College dropout, self-proclaimed underground rapper.",
+                talent: "Fast-rapting a song entirely about his ex-girlfriend's dog.",
+                roastReaction: "The dog dodged a bullet, honestly."
+            }
+        ];
+
+        let currentState = 'lobby';
+        let currentIndex = 0;
+        let score = 0;
+        let judgeComment = "";
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            if (currentState === 'lobby') {
+                app.innerHTML = `
+                    <div class="flex flex-col items-center text-center px-4">
+                        <div class="w-24 h-24 bg-neutral-900 border-2 border-red-600 rounded-full flex items-center justify-center text-4xl mb-6 shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-pulse">
+                            🎤
+                        </div>
+                        <h2 class="text-2xl font-bold mb-2">Ready to Judge Some Questionable Life Choices?</h2>
+                        <p class="text-neutral-400 max-w-md text-sm mb-8">
+                            Review unhinged contestants, hand out harsh scores, and try not to get cancelled by internet chat.
+                        </p>
+                        <button onclick="startGame()" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl tracking-wider shadow-lg transition-transform active:scale-95 cursor-pointer">
+                            START SHOW (₹199 Paid)
+                        </button>
+                    </div>
+                `;
+            } else if (currentState === 'performing' || currentState === 'judged') {
+                const c = contestants[currentIndex];
+                app.innerHTML = `
+                    <!-- STAGE AREA -->
+                    <div class="w-full flex items-center justify-between my-4 px-2">
+                        <!-- Guard Left -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-36 bg-neutral-900 border-2 border-neutral-800 rounded-t-full flex items-center justify-center shadow-lg">
+                                <span class="text-[10px] text-neutral-600 [writing-mode:vertical-lr] tracking-widest">SECURITY</span>
+                            </div>
+                            <div class="w-18 h-5 bg-neutral-900 rounded-full mt-1 border border-neutral-800"></div>
+                        </div>
+
+                        <!-- Center Stage -->
+                        <div class="flex-1 mx-4 min-h-[320px] bg-neutral-900/60 border border-neutral-800 rounded-2xl flex flex-col items-center justify-between p-6 relative overflow-hidden shadow-inner">
+                            <div class="w-24 h-24 bg-red-950/40 border border-red-600/40 rounded-full flex items-center justify-center text-3xl mb-2 z-10">
+                                👤
+                            </div>
+                            <div class="text-center z-10 w-full">
+                                <span class="text-xs px-2.5 py-1 bg-red-950 text-red-400 font-semibold rounded-full border border-red-800">
+                                    Contestant #${currentIndex + 1}
+                                </span>
+                                <h3 class="text-xl font-bold text-neutral-100 mt-2">${c.name}, ${c.age}</h3>
+                                <p class="text-xs text-neutral-400 mt-1 italic">"${c.bio}"</p>
+                                <div class="mt-4 p-3 bg-neutral-950/80 border border-neutral-800 rounded-lg text-sm text-neutral-300">
+                                    <span class="text-red-500 font-bold">Act:</span> ${c.talent}
+                                </div>
+                            </div>
+                            <div class="mt-4 w-full text-center z-10">
+                                <p class="text-xs text-yellow-500 font-medium bg-yellow-950/30 border border-yellow-900/50 py-1.5 px-3 rounded-md">
+                                    ${judgeComment}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Guard Right -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-36 bg-neutral-900 border-2 border-neutral-800 rounded-t-full flex items-center justify-center shadow-lg">
+                                <span class="text-[10px] text-neutral-600 [writing-mode:vertical-lr] tracking-widest">SECURITY</span>
+                            </div>
+                            <div class="w-18 h-5 bg-neutral-900 rounded-full mt-1 border border-neutral-800"></div>
+                        </div>
+                    </div>
+
+                    <!-- CONTROLS & JUDGES PANEL -->
+                    <div class="w-full max-w-4xl flex flex-col gap-3 mt-4">
+                        ${currentState === 'performing' ? `
+                            <div class="flex justify-center gap-3 w-full">
+                                <button onclick="handleJudge('roast')" class="flex-1 py-3 bg-neutral-900 hover:bg-red-950 border border-neutral-800 hover:border-red-600 text-xs font-bold text-red-400 rounded-xl transition-all cursor-pointer">
+                                    🔥 ROAST & GIVE LOW SCORE
+                                </button>
+                                <button onclick="handleJudge('pity')" class="flex-1 py-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-bold text-neutral-300 rounded-xl transition-all cursor-pointer">
+                                    🤷‍♂️ AVERAGE PITY SCORE
+                                </button>
+                                <button onclick="handleJudge('golden')" class="flex-1 py-3 bg-neutral-900 hover:bg-yellow-950 border border-neutral-800 hover:border-yellow-600 text-xs font-bold text-yellow-400 rounded-xl transition-all cursor-pointer">
+                                    ⭐ 10/10 PURE DELUSION
+                                </button>
+                            </div>
+                        ` : `
+                            <button onclick="nextContestant()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg cursor-pointer">
+                                Next Unfortunate Soul ➔
+                            </button>
+                        `}
+
+                        <!-- Judges Desk -->
+                        <div class="w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-3 flex items-center justify-around shadow-2xl">
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 bg-neutral-800 rounded-full border border-neutral-700 flex items-center justify-center text-lg">😒</div>
+                                <span class="text-[10px] text-neutral-400 mt-1 font-medium">Guest</span>
+                            </div>
+                            <div class="flex flex-col items-center transform -translate-y-1">
+                                <div class="w-14 h-14 bg-red-950/80 rounded-full border-2 border-red-600 flex items-center justify-center text-xl shadow-[0_0_10px_rgba(220,38,38,0.5)]">😏</div>
+                                <span class="text-[10px] text-red-500 font-bold mt-1">Samay</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-12 h-12 bg-neutral-800 rounded-full border border-neutral-700 flex items-center justify-center text-lg">🙄</div>
+                                <span class="text-[10px] text-neutral-400 mt-1 font-medium">Guest</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (currentState === 'gameover') {
+                app.innerHTML = `
+                    <div class="flex flex-col items-center text-center px-4">
+                        <div class="w-20 h-20 bg-neutral-900 border border-neutral-800 rounded-full flex items-center justify-center text-3xl mb-4">🏆</div>
+                        <h2 class="text-2xl font-bold mb-1">Show Concluded!</h2>
+                        <p class="text-neutral-400 text-sm mb-4">Total accumulated panel score: <span class="text-red-500 font-bold">${score}</span></p>
+                        <p class="text-xs text-neutral-500 mb-6 max-w-xs">You successfully survived judging internet strangers. Time to touch grass.</p>
+                        <button onclick="startGame()" class="px-6 py-2.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs font-bold text-white rounded-xl transition-all cursor-pointer">
+                            Play Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function startGame() {
+            currentIndex = 0;
+            score = 0;
+            currentState = 'performing';
+            judgeComment = "Contestant has walked onto the stage. Let's see how fast they ruin their life.";
+            render();
+        }
+
+        function handleJudge(type) {
+            const c = contestants[currentIndex];
+            let pts = 0;
+            if (type === 'roast') {
+                pts = Math.floor(Math.random() * 4);
+                judgeComment = `Samay: "${c.roastReaction}"`;
+            } else if (type === 'pity') {
+                pts = Math.floor(Math.random() * 4) + 3;
+                judgeComment = `Guest Judge: "Arey bechara, thode numbers de dete hain."`;
+            } else if (type === 'golden') {
+                pts = 10;
+                judgeComment = `Samay: "10 points! Absolute cinema. Absolute trash, but cinema."`;
+            }
+            score += pts;
+            currentState = 'judged';
+            render();
+        }
+
+        function nextContestant() {
+            if (currentIndex + 1 < contestants.length) {
+                currentIndex++;
+                currentState = 'performing';
+                judgeComment = "Next contestant steps into the spotlight...";
+                render();
+            } else {
+                currentState = 'gameover';
+                render();
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
